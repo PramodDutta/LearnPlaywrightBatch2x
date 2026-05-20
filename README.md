@@ -49,9 +49,10 @@ graph TB
             ch6["Ch 6: Operators ✅"]
             ch7["Ch 7: If / Else ✅"]
             ch8["Ch 8: Switch ✅"]
-            ch9["Ch 9: Loops"]
-            ch10["Ch 10: Arrays"]
-            ch11["Ch 11: Functions & Strings"]
+            ch9["Ch 9: User Input ✅"]
+            ch10["Ch 10: Loops"]
+            ch11["Ch 11: Arrays"]
+            ch12_fn["Ch 12: Functions & Strings"]
         end
 
         subgraph adv["⚙️ Advanced JS (Weeks 7–8)"]
@@ -176,10 +177,27 @@ LearnPlaywrightBatch2x/
 │   └── 58_LEAP_YEAR.js                 # Leap year rules (% 4, % 100, % 400)
 │
 ├── chapter_08_Switch_Statement/        ✅ Switch cases
-│   └── 59_Switch.js                    # Switch statement basics
+│   ├── 59_Switch.js                    # Switch statement basics
+│   ├── 60_No_Break.js                  # Fall-through when `break` is missing
+│   ├── 61_Default.js                   # `default` branch
+│   ├── 62_REAL_TIME_EXAMPLE.js         # Real-world switch usage
+│   ├── 63_Switch_Group.js              # Grouped cases (shared body)
+│   ├── 64_IQ.js                        # Interview Q — switch trap 1
+│   ├── 65_IQ2.js                       # Interview Q — switch trap 2
+│   ├── 66_IQ3.js                       # Interview Q — switch trap 3
+│   └── 67_IQ4.js                       # Interview Q — switch trap 4
+│
+├── chapter_09_UserInput/               ✅ Reading user input in Node
+│   ├── 68_User_Input.js                # Browser `prompt()` — does NOT work in Node
+│   ├── 69_Node_readline.js             # Node built-in `readline` (async)
+│   └── 70_prompt_sync.js               # `prompt-sync` npm package (sync)
 │
 └── README.md                           👋 You are here
 ```
+
+> Each chapter has its **own README.md** with full code walk-throughs and expected output. Jump straight in:
+>
+> [Ch 1](./chapter_01_Basics/README.md) · [Ch 2](./chapter_02_Javascript_Concepts/README.md) · [Ch 3](./chapter_03_Identifier_Literals/README.md) · [Ch 4](./chapter_04_Javascript_Concepts/README.md) · [Ch 5](./chapter_05_Literal/README.md) · [Ch 6](./chapter_06_Operator/README.md) · [Ch 7](./chapter_07_If_else/README.md) · [Ch 8](./chapter_08_Switch_Statement/README.md) · [Ch 9](./chapter_09_UserInput/README.md)
 
 > **Legend:** ✅ Done · 🚧 Coming soon
 
@@ -1400,11 +1418,21 @@ if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) {
 
 ## 📖 What's in Chapter 8 — Switch Statement (Available Now)
 
+> 🔗 **Full walk-through:** [chapter_08_Switch_Statement/README.md](./chapter_08_Switch_Statement/README.md)
+
 ### Files
 
 | File | Topic | What you'll learn |
 |------|-------|-------------------|
 | `59_Switch.js` | Switch basics | `switch (expr)` with `case` and `default` |
+| `60_No_Break.js` | Fall-through | What happens when you forget `break` |
+| `61_Default.js` | `default` | The catch-all branch |
+| `62_REAL_TIME_EXAMPLE.js` | Real-world | Status / role / env routing with `switch` |
+| `63_Switch_Group.js` | Grouped cases | Multiple `case` labels sharing one body |
+| `64_IQ.js` | Interview Q | Switch trap #1 |
+| `65_IQ2.js` | Interview Q | Switch trap #2 |
+| `66_IQ3.js` | Interview Q | Switch trap #3 |
+| `67_IQ4.js` | Interview Q | Switch trap #4 |
 
 ### Key Concepts
 
@@ -1413,12 +1441,57 @@ mindmap
   root((Chapter 8 — Switch))
     switch
       expression
+      strict ===
     case
       value match
       break to exit
+      grouped cases
     default
       fallback
+    fall-through
+      missing break
 ```
+
+---
+
+## 📖 What's in Chapter 9 — User Input (Available Now)
+
+> 🔗 **Full walk-through:** [chapter_09_UserInput/README.md](./chapter_09_UserInput/README.md)
+
+### Files
+
+| File | Topic | What you'll learn |
+|------|-------|-------------------|
+| `68_User_Input.js` | `prompt()` (browser) | Browser-only API — fails in Node with `ReferenceError` |
+| `69_Node_readline.js` | Node `readline` | Built-in module, async `rl.question()` for terminal input |
+| `70_prompt_sync.js` | `prompt-sync` | npm package for synchronous terminal input |
+
+### Key Concepts
+
+```mermaid
+mindmap
+  root((Chapter 9 — User Input))
+    Browser
+      prompt&#40;&#41;
+      not in Node
+    Node built-in
+      readline
+      async callback
+      rl.close&#40;&#41;
+    npm package
+      prompt-sync
+      synchronous
+      one-liner
+    Always
+      input is string
+      Number&#40;input&#41; to parse
+```
+
+| Approach | Where it runs | Style | Needs install |
+|----------|---------------|-------|:--:|
+| `prompt()` | Browser only | Sync | ❌ (built-in to browser) |
+| `readline` | Node | Async (callback) | ❌ (built-in to Node) |
+| `prompt-sync` | Node | Sync | ✅ (`npm i prompt-sync`) |
 
 ---
 
@@ -1426,10 +1499,10 @@ mindmap
 
 ```mermaid
 graph TD
-    subgraph next["Next Up — Data Structures & Async"]
-        N1[Ch 9: Loops — for, while, do-while] --> N2[Ch 10: Arrays]
-        N2 --> N3[Ch 11: Functions & Strings]
-        N3 --> N4[Ch 12: Objects]
+    subgraph next["Next Up — Loops, Data & Functions"]
+        N1[Ch 10: Loops — for, while, do-while] --> N2[Ch 11: Arrays]
+        N2 --> N3[Ch 12: Functions & Strings]
+        N3 --> N4[Ch 13: Objects]
     end
 
     style next fill:#fff3e0,stroke:#e65100
@@ -1441,7 +1514,9 @@ graph TD
 - ✅ Chapter 6 — **Operators (Part 1)**: arithmetic, comparison (`==` vs `===`), confusing-comparisons reference, logical, string concat (files `30`–`40`)
 - ✅ Chapter 6 — **Operators (Part 2)**: ternary `? :`, `typeof`, `++`/`--` pre/post, nullish `??`, mixed-increment IQ trap (files `41`–`47`)
 - ✅ Chapter 7 — **If / Else**: basic if/else, else-if ladder, nested conditions, truthy/falsy, logical operators, IQ problems (files `48`–`58`)
-- ✅ Chapter 8 — **Switch Statement**: switch case basics (file `59`)
+- ✅ Chapter 8 — **Switch Statement**: switch basics, fall-through, default, grouped cases, IQ traps (files `59`–`67`)
+- ✅ Chapter 9 — **User Input**: browser `prompt()`, Node `readline`, `prompt-sync` (files `68`–`70`)
+- ✅ **Per-chapter README** — every chapter folder now has its own deep-dive README.md
 
 ---
 
