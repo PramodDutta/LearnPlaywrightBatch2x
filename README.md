@@ -54,6 +54,7 @@ graph TB
             ch11["Ch 11: Arrays ✅"]
             ch12_fn["Ch 12: Functions ✅"]
             ch13_str["Ch 13: Strings ✅"]
+            ch14_obj["Ch 14: Objects ✅"]
         end
 
         subgraph adv["⚙️ Advanced JS (Weeks 7–8)"]
@@ -254,6 +255,22 @@ LearnPlaywrightBatch2x/
 │   ├── 122_Transform_Str.js            # case, trim, replace/replaceAll, concat, split/join
 │   ├── 123_SC.js                       # String conversion — toString, Number, parseInt, parseFloat
 │   └── javascript_stringcheatsheet.md  # 📋 Full string-method cheat sheet (40+ methods, tables)
+│
+├── chapter_14_Objects/                 ✅ Objects — literals, access, ref vs primitive, destructuring, spread, get/set, this
+│   ├── 124_Objects.js                  # Object literal, keys/values, JSON vs JS object
+│   ├── 125_Objects2.js                 # key:value pairs, copy by reference, === on objects
+│   ├── 126_Objects_Creation.js         # Two identical literals are NOT === (different references)
+│   ├── 127_Objects_REAL.js             # Build config object dynamically, dot access, delete
+│   ├── 128_Primitive_Ref.js            # 🔥 Primitive (copy by value) vs Reference (copy by ref)
+│   ├── 129_Ob_Examples.js              # JSON-style "quoted keys" vs JS unquoted keys
+│   ├── 130_IQ.js                       # Dynamic property access obj[key], getOwnPropertyDescriptor
+│   ├── 131_Object_Fn.js                # Methods on objects — add(n), subtract(n)
+│   ├── 132_Obj_Decon.js                # Destructuring — rename, defaults, nested
+│   ├── 133_Spead.js                    # Spread {...obj} copy, const blocks reassignment
+│   ├── 134_Objects_GET_SET_Methods.js  # get/set accessors + `this`
+│   ├── 135_IQ                          # Object.keys/values/entries + for...in
+│   ├── 136_Obj_REAL.js                 # Real test config — ENV, expected response, nested objects
+│   └── 137_Let_const_obj.js            # let vs const for objects — mutate yes, reassign no
 │
 └── README.md                           👋 You are here
 ```
@@ -3060,14 +3077,366 @@ str.slice(10, 6);    // ""          — slice returns empty
 
 ---
 
+## 📖 What's in Chapter 14 — Objects (Available Now)
+
+### Files
+
+| File | Topic | What you'll learn |
+|------|-------|-------------------|
+| `124_Objects.js` | Object literals | `{ key: value }`, dot access, JSON vs JS object shape |
+| `125_Objects2.js` | Keys & reference copy | Unquoted keys, `let b = a` copies the reference, `b === a` is `true` |
+| `126_Objects_Creation.js` | Identity | Two identical literals are **not** `===` — different memory references |
+| `127_Objects_REAL.js` | Build & delete | Add props dynamically (`config.browser = …`), `delete`, guard with dot access |
+| `128_Primitive_Ref.js` | 🔥 Value vs Reference | Primitives copy by **value**, objects/arrays/functions copy by **reference** |
+| `129_Ob_Examples.js` | JSON vs JS | `"quoted"` keys (JSON) vs unquoted keys (JS object literal) |
+| `130_IQ.js` | Dynamic access | `obj[key]` with a variable, `Object.getOwnPropertyDescriptor` flags |
+| `131_Object_Fn.js` | Methods | Functions as object members — `calculator.add(n)` |
+| `132_Obj_Decon.js` | Destructuring | Pull props into variables, rename, default values, nested destructuring |
+| `133_Spead.js` | Spread / copy | `{ ...obj }` shallow copy, merge, `const` blocks reassignment |
+| `134_Objects_GET_SET_Methods.js` | Getters / setters | `get`/`set` accessors and the `this` keyword |
+| `135_IQ` | Iterate | `Object.keys` / `values` / `entries`, `for...in` |
+| `136_Obj_REAL.js` | Real config | Test `ENV`, expected API response, nested config objects |
+| `137_Let_const_obj.js` | `let` vs `const` | Mutate properties freely; `const` blocks only reassignment of the binding |
+
+### Concept
+
+An **object** is an unordered collection of `key: value` pairs — the core data structure for grouping related data (a user, a config, an API response). Unlike primitives, objects are held by **reference**: a variable stores a pointer to the object in memory, not the object itself.
+
+### Why
+
+Everything in test automation is an object — Playwright `config`, fixtures, API request/response bodies, test data. Understanding reference semantics (why `b = a` then `b.x = 1` also changes `a.x`) prevents a whole category of "my test data mutated itself" bugs.
+
+**Q&A — why use this?**
+- **Q: Why does changing `b` also change `a` after `let b = a`?** A: Objects copy by **reference** — `a` and `b` point to the **same** object. Mutating through either name mutates the one shared object. Use `{ ...a }` for an independent copy.
+- **Q: Why are two `{ status: "pass" }` literals not `===`?** A: Each literal creates a **new** object at a new memory address. `===` compares references, not contents — different addresses → `false`. Compare contents with `JSON.stringify` or a deep-equal helper.
+- **Q: Dot `obj.name` or bracket `obj["name"]`?** A: Dot for known, fixed keys. Bracket when the key is **dynamic** (in a variable) or not a valid identifier (`obj["first name"]`).
+
+### Key Concepts
+
+```mermaid
+mindmap
+  root((Chapter 14 — Objects))
+    Create
+      literal {key: value}
+      empty {}
+      JSON quoted keys
+      JS unquoted keys
+    Access
+      dot obj.name
+      bracket obj&#91;key&#93;
+      dynamic key var
+    Mutate
+      add obj.x = 1
+      update obj.x = 2
+      delete obj.x
+    Reference
+      copy by reference
+      b = a shares object
+      === compares references
+      spread {...obj} copies
+    Destructure
+      pull props
+      rename
+      defaults
+      nested
+    Methods
+      fn members
+      get / set
+      this keyword
+    Iterate
+      Object.keys
+      Object.values
+      Object.entries
+      for...in
+    Binding
+      const blocks reassign
+      properties stay mutable
+```
+
+### Run them
+
+```bash
+node chapter_14_Objects/124_Objects.js                  # → object literals + JSON shape
+node chapter_14_Objects/125_Objects2.js                 # → reference copy, b === a → true
+node chapter_14_Objects/128_Primitive_Ref.js            # → value vs reference semantics
+node chapter_14_Objects/132_Obj_Decon.js                # → destructuring, rename, defaults, nested
+node chapter_14_Objects/133_Spead.js                    # → spread copy + const reassignment block
+node chapter_14_Objects/134_Objects_GET_SET_Methods.js  # → getter/setter + this
+node chapter_14_Objects/137_Let_const_obj.js            # → mutate ok, reassign blocked by const
+```
+
+---
+
+### 124 — Object Basics (literals, access, JSON vs JS)
+
+**Concept:** An object literal `{ key: value }` groups related data. Read it with dot (`obj.name`) or bracket (`obj["name"]`) notation. JS keys are unquoted; the quoted-key form (`{ "name": … }`) is JSON.
+
+**Why:** Objects model real entities — a user, a test config, a request payload. They are the most common shape you pass around in Playwright and API tests.
+
+**Q&A — why use this?**
+- **Q: When are keys quoted?** A: Only in JSON, or when a key isn't a valid identifier (`"first name"`, `"data-id"`). Plain JS object keys are unquoted.
+- **Q: How do I add a property after creation?** A: Assign to a new key — `config.browser = "chrome"`. The object grows. `delete config.browser` removes it.
+- **Q: What does `obj.missing` return?** A: `undefined` — not an error. Guard with `if (obj.x)` or `obj.x ?? fallback` before using it.
+
+```mermaid
+flowchart LR
+    O["obj = { name, age }"] --> D["obj.name (dot)"]
+    O --> B["obj&#91;'age'&#93; (bracket)"]
+    O --> A["obj.city = 'NYC' (add)"]
+    O --> X["delete obj.age (remove)"]
+    style O fill:#e3f2fd,stroke:#01579b
+```
+
+```js
+// 124 + 127 + 130 — combined
+let config = {};
+config.browser = "chrome";      // add property
+config.timeout = 3000;
+console.log(config);            // { browser: 'chrome', timeout: 3000 }
+
+delete config.browser;          // remove property
+console.log(config);            // { timeout: 3000 }
+
+const user = { name: "John", age: 30 };
+const key = "age";
+console.log(user.name);         // "John"   — dot
+console.log(user[key]);         // 30       — dynamic bracket access
+```
+
+---
+
+### 128 — Primitive vs Reference (the #1 gotcha)
+
+**Concept:** Primitives (`number`, `string`, `boolean`, …) are copied **by value** — the copy is independent. Objects, arrays, and functions are copied **by reference** — the copy points at the *same* underlying object.
+
+**Why:** This single rule explains the most common "why did my data change?" bug in test code. Pass an object to a helper, mutate it there, and the caller's object changes too — because there was only ever one object.
+
+**Q&A — why use this?**
+- **Q: After `let b = a` (objects), are they linked?** A: Yes — both names point to one object. `b.val = 99` makes `a.val` 99 too. There is no copy.
+- **Q: How do I make a real, independent copy?** A: Shallow: `{ ...a }` or `Object.assign({}, a)`. Deep (nested objects): `structuredClone(a)` or `JSON.parse(JSON.stringify(a))`.
+- **Q: Does this apply to function arguments?** A: Yes. Passing an object to a function passes the reference — mutations inside the function are visible outside. Primitives passed in are safe copies.
+
+```mermaid
+flowchart TB
+    subgraph prim["Primitive — copy by VALUE"]
+        PA["a = 10"] --> PB["b = a → 10"]
+        PB --> PC["b = 99"]
+        PC --> PR["a still 10 ✅"]
+    end
+    subgraph ref["Reference — copy by REFERENCE"]
+        RA["obj1 = { val: 10 }"] --> RB["obj2 = obj1"]
+        RB --> RBOX[("one object<br/>{ val }")]
+        RA --> RBOX
+        RB --> RC["obj2.val = 99"]
+        RC --> RR["obj1.val is 99 ⚠️"]
+    end
+    style PR fill:#e8f5e9,stroke:#2e7d32
+    style RR fill:#ffebee,stroke:#c62828
+```
+
+```js
+// 128_Primitive_Ref.js
+let a = 10;
+let b = a;          // copy the VALUE
+b = 99;
+console.log(a);     // 10  ← a is untouched
+
+let obj1 = { val: 10 };
+let obj2 = obj1;    // copy the REFERENCE (same object)
+obj2.val = 99;
+console.log(obj1.val); // 99 ← both names point to one object
+
+// Independent copy:
+let obj3 = { ...obj1 };
+obj3.val = 1;
+console.log(obj1.val); // 99 ← obj3 is its own object
+```
+
+| | Primitive | Object / Array / Function |
+|:-|:-:|:-:|
+| Copied by | **value** | **reference** |
+| `b = a; b = x` affects `a`? | ❌ no | ⚠️ yes (when mutating, not reassigning) |
+| Independent copy | automatic | `{ ...a }`, `structuredClone(a)` |
+| `===` compares | value | reference (identity) |
+
+---
+
+### 132 — Destructuring (rename, defaults, nested)
+
+**Concept:** Destructuring pulls properties out of an object straight into variables — `const { name, age } = user`. You can rename (`name: userName`), supply defaults (`country = "USA"`), and reach into nested objects.
+
+**Why:** It keeps test code clean — grab exactly the fields you need from a fixture, config, or API response in one line instead of repeating `response.body.user.…` everywhere.
+
+**Q&A — why use this?**
+- **Q: How do I rename while destructuring?** A: `const { name: userName } = user` — `name` is the source key, `userName` is the new variable. The original key name does not become a variable.
+- **Q: What if the property is missing?** A: Provide a default — `const { country = "USA" } = user`. If `user.country` is `undefined`, `country` becomes `"USA"`.
+- **Q: Can I destructure nested objects?** A: Yes — `const { user: { address: { city } } } = data`. Only `city` becomes a variable; the intermediate names are just the path.
+
+```mermaid
+flowchart LR
+    U["user = { name1, age, city }"] --> R1["{ name1: userName } → rename"]
+    U --> R2["{ country = 'USA' } → default"]
+    D["data.user.address.city"] --> R3["{ user: { address: { city } } } → nested"]
+    style U fill:#e3f2fd,stroke:#01579b
+    style D fill:#f3e5f5,stroke:#7b1fa2
+```
+
+```js
+// 132_Obj_Decon.js
+const user = { name1: "John", age: 30, city: "NYC" };
+
+// Rename
+const { name1: userName, age: userAge } = user;
+console.log(userName, userAge);   // John 30
+
+// Default value (key absent → fallback)
+const { country = "USA" } = user;
+console.log(country);             // USA
+
+// Nested
+const data = {
+    user: { name: "John", address: { city: "NYC" } }
+};
+const { user: { address: { city } } } = data;
+console.log(city);                // NYC
+```
+
+---
+
+### 133 / 137 — Spread Copy & `let` vs `const` for Objects
+
+**Concept:** `{ ...obj }` spreads an object's own properties into a new object — a shallow copy or merge. Declaring the binding with `const` locks **which** object the variable points to; it does **not** freeze the contents — properties stay fully mutable.
+
+**Why:** Spread is the idiomatic way to copy/merge config without sharing a reference. `const` for objects is the team default: the reference rarely changes, so `const` signals stable intent and turns accidental reassignment into a loud error.
+
+**Q&A — why use this?**
+- **Q: Does `const` make an object immutable?** A: No. `const obj = {…}` blocks `obj = somethingElse` (reassignment) but allows `obj.x = 1`, `delete obj.y`. Use `Object.freeze(obj)` to lock contents.
+- **Q: When do I actually need `let` for an object?** A: Only when you reassign the **binding** to a different object (`config = { … }`). Rare — mutating or spreading into a new `const` is preferred.
+- **Q: Is `{ ...obj }` a deep copy?** A: No — **shallow**. Nested objects are still shared by reference. Deep copy needs `structuredClone(obj)`.
+
+```mermaid
+flowchart TD
+    C["const obj1 = { a: 1, b: 2 }"] --> M["obj1.a = 99 ✅ mutate contents"]
+    C --> ADD["obj1.c = 3 ✅ add prop"]
+    C --> COPY["const copy = { ...obj1 } ✅ new object"]
+    C --> RE["obj1 = { x: 5 } ❌ TypeError: Assignment to constant"]
+    style M fill:#e8f5e9,stroke:#2e7d32
+    style ADD fill:#e8f5e9,stroke:#2e7d32
+    style COPY fill:#e8f5e9,stroke:#2e7d32
+    style RE fill:#ffebee,stroke:#c62828
+```
+
+```js
+// 133_Spead.js + 137_Let_const_obj.js
+const obj1 = { a: 1, b: 2 };
+const copy = { ...obj1 };        // shallow copy — independent object
+console.log(copy);               // { a: 1, b: 2 }
+
+const config = { browser: "Chrome", timeout: 3000 };
+config.browser = "Firefox";      // ✅ mutate property — allowed
+config.retries = 2;              // ✅ add property — allowed
+console.log(config);             // { browser: 'Firefox', timeout: 3000, retries: 2 }
+// config = { browser: "Safari" };  // ❌ TypeError: Assignment to constant variable
+
+// let needed ONLY when reassigning the binding to a new object:
+let active = { browser: "Chrome" };
+active = { browser: "Safari" };  // points to a different object
+```
+
+| Action on `const obj` | Allowed? |
+|:----------------------|:--------:|
+| `obj.x = 1` (mutate) | ✅ |
+| `obj.y = 2` (add) | ✅ |
+| `delete obj.z` (remove) | ✅ |
+| `obj = { … }` (reassign) | ❌ TypeError |
+| `Object.freeze(obj)` then `obj.x = 1` | ⚠️ ignored (throws in strict mode) |
+
+> 📎 Full interview write-up of this in [`interview.md`](./interview.md#objects).
+
+---
+
+### 134 — Getters, Setters & `this`
+
+**Concept:** A `get` accessor runs like a property read (`user.fullName`, no parentheses) and a `set` accessor runs on assignment (`user.fullName = "…"`). Inside both, `this` refers to the object the accessor lives on.
+
+**Why:** Getters/setters compute derived values (full name from first + last) and validate or split values on write — a stepping stone to classes and Page Object Model properties in Playwright.
+
+**Q&A — why use this?**
+- **Q: Why no `()` when calling a getter?** A: A getter *is* a property — you read it like data (`user.fullName`), and the function runs behind the scenes. That's the point: a computed value that looks like a field.
+- **Q: What does `this` point to?** A: The object the method/accessor is called on. `this.firstName` reads the current object's `firstName`. Arrow functions don't bind their own `this` — avoid them for object methods.
+- **Q: When prefer get/set over a plain method?** A: When it reads naturally as a property (`order.total`, `user.fullName`). Use a method (`calc.add(n)`) when it's clearly an action with arguments.
+
+```mermaid
+flowchart LR
+    R["read user.fullName"] --> G["get fullName() returns this.first + this.last"]
+    W["user.fullName = 'Amit Sharma'"] --> S["set fullName(v) splits v into first + last"]
+    style G fill:#e8f5e9,stroke:#2e7d32
+    style S fill:#fff3e0,stroke:#e65100
+```
+
+```js
+// 134_Objects_GET_SET_Methods.js
+const user = {
+    firstName: "Pramod",
+    lastName: "Dutta",
+    get fullName() {
+        return this.firstName + " " + this.lastName;
+    },
+    set fullName(value) {
+        [this.firstName, this.lastName] = value.split(" ");
+    }
+};
+
+console.log(user.fullName);      // "Pramod Dutta"  — getter, no ()
+user.fullName = "Amit Sharma";   // setter — splits into first/last
+console.log(user.firstName);     // "Amit"
+console.log(user.lastName);      // "Sharma"
+```
+
+---
+
+### 135 — Iterating Objects (`keys` / `values` / `entries`, `for...in`)
+
+**Concept:** Objects aren't directly iterable like arrays. `Object.keys(obj)`, `Object.values(obj)`, and `Object.entries(obj)` turn an object into arrays you can loop; `for...in` walks the keys directly.
+
+**Why:** You constantly need to walk a config, an API response, or test data — log every field, transform values, or assert each entry.
+
+**Q&A — why use this?**
+- **Q: `keys` vs `values` vs `entries`?** A: `keys` → `["a","b"]`; `values` → `[1,2]`; `entries` → `[["a",1],["b",2]]`. Use `entries` when you need both key and value in the loop.
+- **Q: `for...in` or `Object.keys().forEach`?** A: `Object.keys()` is safer — `for...in` also walks inherited enumerable keys. With `Object.keys()` you only get the object's own keys.
+- **Q: How do I loop key+value cleanly?** A: `Object.entries(obj).forEach(([k, v]) => …)` — array destructuring in the callback gives you both at once.
+
+```mermaid
+flowchart LR
+    O["obj = { a: 1, b: 2, c: 3 }"] --> K["Object.keys → &#91;'a','b','c'&#93;"]
+    O --> V["Object.values → &#91;1, 2, 3&#93;"]
+    O --> E["Object.entries → &#91;&#91;'a',1&#93;,&#91;'b',2&#93;,&#91;'c',3&#93;&#93;"]
+    style O fill:#e3f2fd,stroke:#01579b
+```
+
+```js
+// 135_IQ
+const obj = { a: 1, b: 2, c: 3 };
+console.log(Object.keys(obj));     // [ 'a', 'b', 'c' ]
+console.log(Object.values(obj));   // [ 1, 2, 3 ]
+console.log(Object.entries(obj));  // [ ['a',1], ['b',2], ['c',3] ]
+
+const user = { name: "John", age: 30 };
+for (const key in user) {
+    console.log(`${key}: ${user[key]}`);   // name: John / age: 30
+}
+```
+
+---
+
 ## 🔭 What's Coming Next
 
 ```mermaid
 graph TD
-    subgraph next["Next Up — Objects, 2D Arrays"]
-        N1[Ch 12: Functions ✅] --> N2[Ch 13: Strings ✅]
-        N2 --> N3[Ch 14: Objects]
-        N3 --> N4[Ch 15: 2D Arrays]
+    subgraph next["Next Up — 2D Arrays, Callbacks"]
+        N1[Ch 13: Strings ✅] --> N2[Ch 14: Objects ✅]
+        N2 --> N3[Ch 15: 2D Arrays]
+        N3 --> N4[Ch 16: Callbacks]
     end
 
     style next fill:#fff3e0,stroke:#e65100
@@ -3087,6 +3456,7 @@ graph TD
 - ✅ Chapter 12 — **Functions (Part 1)**: define + call, four function types, parameter vs argument, template-literal returns, function expression, arrow functions (files `96`–`103`)
 - ✅ Chapter 12 — **Functions (Part 2)**: all-three forms side-by-side, IIFE, default/rest/spread params, scope, closures, higher-order functions, pure functions (files `104`–`117`)
 - ✅ Chapter 13 — **Strings**: quotes/template literals, properties & indexing, search/check, slice vs substring, transform (case/trim/replace/split), conversion + a full method cheat sheet (files `118`–`123`)
+- ✅ Chapter 14 — **Objects**: literals & access, primitive vs reference, destructuring, spread copy, `let` vs `const` for objects, get/set + `this`, `keys`/`values`/`entries` (files `124`–`137`)
 - ✅ **Per-chapter README** — every chapter folder now has its own deep-dive README.md
 
 ---
