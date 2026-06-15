@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# OS junk
+.DS_Store
+
+# Editor / tooling
+.commandcode/
+
+# Playwright artifacts
+test-results/
+playwright-report/
+playwright/.cache/
