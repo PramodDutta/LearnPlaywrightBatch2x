@@ -324,15 +324,23 @@ LearnPlaywrightBatch2x/
 │   ├── playwright.config.ts            # defineConfig — testDir, headless:false, html reporter, trace
 │   └── package.json                    # @playwright/test dependency
 │
-├── chaptet_20_Typescript_Basics/       ✅ TypeScript Basics — ES modules, export / import
+├── chaptet_20_OOPs_Basics/             ✅ OOP Basics — ES modules + classes & objects
 │   ├── utils.js                        # named exports — BASE_URL, formatTestName
 │   ├── testutils.js                    # named exports — BASE_URL, formatUpperCaseString
 │   ├── logger.js                       # default export (log) + named export (log2)
-│   └── EXPORT_IMPORT/
-│       ├── 168_EXPORT_IMPORT.js        # export keyword intro
-│       ├── 169_Utils.js                # named imports + `as` alias for name clashes
-│       ├── 170_Logger.js               # default import — no braces, any name
-│       └── ExplainDefault.md           # deep-dive: default vs non-default exports
+│   ├── 01_EXPORT_IMPORT/
+│   │   ├── 168_EXPORT_IMPORT.js        # export keyword intro
+│   │   ├── 169_Utils.js                # named imports + `as` alias for name clashes
+│   │   ├── 170_Logger.js               # default import — no braces, any name
+│   │   └── ExplainDefault.md           # deep-dive: default vs non-default exports
+│   └── 02_CLASS_OBJECT/
+│       ├── 171_Class_Object.js         # class shape — attributes + behaviour
+│       ├── 172_Class_Object2.js        # constructor fires on `new`, object reference
+│       ├── 173_Car.js                  # parameterised constructor + `this`
+│       ├── 174_REAL_Browser.js         # TestCase class — method vs function
+│       ├── 175_IQ.js                    # param constructor, per-object state
+│       ├── 176_Private_Public.js       # `#private` fields vs public
+│       └── 177_Statis.js / 178_Statis.js  # static fields & methods (class-level)
 │
 └── README.md                           👋 You are here
 ```
@@ -4155,20 +4163,22 @@ npx playwright codegen https://app.thetestingacademy.com/playwright/ttacart/  # 
 
 ---
 
-## 📖 What's in Chapter 20 — TypeScript Basics: Export / Import (Available Now)
+## 📖 What's in Chapter 20 — OOP Basics: Modules + Classes & Objects (Available Now)
 
-The entry point to **ES modules** — how one file shares code and another consumes it. Master `export` / `import` here and every Page Object, fixture, and util file in later chapters reads cleanly.
+Two parts. **Part 1** — ES modules (`export` / `import`), the foundation for sharing code across files. **Part 2** — classes & objects, the heart of OOP: blueprints, `new`, constructors, `this`, `#private` fields, and `static` members. Together they're the spine of every Page Object you'll write later.
 
-### Files
+### Part 1 — Export / Import (`01_EXPORT_IMPORT/`)
+
+The entry point to **ES modules** — how one file shares code and another consumes it.
 
 | File | Topic | What you'll learn |
 |------|-------|-------------------|
 | `utils.js` | Named exports | `export let BASE_URL`, `export function formatTestName` |
 | `testutils.js` | Named exports | A second module exporting its own `BASE_URL` — sets up a name clash |
 | `logger.js` | Default + named | `export default function log` alongside a named `export function log2` |
-| `EXPORT_IMPORT/169_Utils.js` | Named imports | `import { BASE_URL as bul_util }` — braces + `as` alias to dodge clashes |
-| `EXPORT_IMPORT/170_Logger.js` | Default import | `import log from ...` — no braces, name is yours to pick |
-| `EXPORT_IMPORT/ExplainDefault.md` | Reference | Side-by-side default vs non-default export rules |
+| `01_EXPORT_IMPORT/169_Utils.js` | Named imports | `import { BASE_URL as bul_util }` — braces + `as` alias to dodge clashes |
+| `01_EXPORT_IMPORT/170_Logger.js` | Default import | `import log from ...` — no braces, name is yours to pick |
+| `01_EXPORT_IMPORT/ExplainDefault.md` | Reference | Side-by-side default vs non-default export rules |
 
 ### Concept
 
@@ -4221,12 +4231,92 @@ log("starting the test cases"); // [LOG] - default starting the test cases
 ### Run them
 
 ```bash
-cd chaptet_20_Typescript_Basics
-node EXPORT_IMPORT/169_Utils.js     # named imports + alias
-node EXPORT_IMPORT/170_Logger.js    # default import
+cd chaptet_20_OOPs_Basics
+node 01_EXPORT_IMPORT/169_Utils.js     # named imports + alias
+node 01_EXPORT_IMPORT/170_Logger.js    # default import
 ```
 
-> 📄 Full breakdown: [`EXPORT_IMPORT/ExplainDefault.md`](chaptet_20_Typescript_Basics/EXPORT_IMPORT/ExplainDefault.md)
+> 📄 Full breakdown: [`01_EXPORT_IMPORT/ExplainDefault.md`](chaptet_20_OOPs_Basics/01_EXPORT_IMPORT/ExplainDefault.md)
+
+### Part 2 — Classes & Objects (`02_CLASS_OBJECT/`)
+
+| File | Topic | What you'll learn |
+|------|-------|-------------------|
+| `171_Class_Object.js` | Class shape | Attributes (fields) + behaviour (methods) — the blueprint |
+| `172_Class_Object2.js` | `new` + constructor | Constructor fires on `new`; object reference vs the object |
+| `173_Car.js` | Parameterised constructor | Pass values into `new Car("Model S")`, store on `this.name` |
+| `174_REAL_Browser.js` | Method vs function | A method is a function that lives inside a class |
+| `175_IQ.js` | Per-object state | Each `new` makes its own `this` — independent fields |
+| `176_Private_Public.js` | `#private` vs public | `#apiKey` is unreachable outside; expose via a method |
+| `177_Statis.js` / `178_Statis.js` | `static` members | Class-level fields/methods — call on the class, not an instance |
+
+**Concept:** A **class** is a blueprint; an **object** is one instance built with `new`. The `constructor` runs once at creation to seed `this`. `#name` fields are private (hidden outside the class); `static` members belong to the class itself, shared across all instances.
+
+**Why:** Classes bundle data + the behaviour acting on it into one named unit — exactly what a Page Object is (locators = fields, actions = methods). Private fields protect secrets (API keys); static members hold shared config.
+
+**Q&A — why use this?**
+- **Q: Constructor vs a normal method?** A: The `constructor` auto-runs once on `new` to initialise `this`. Normal methods run only when you call them.
+- **Q: What does `#` do?** A: Marks a truly private field — `cred.#apiKey` outside the class throws; `cred.apiKey` is `undefined`. Access it through a method like `getAuthHeader()`.
+- **Q: When `static`?** A: When the value belongs to the class, not any one object — `Student.mentor_name`, a shared counter, a factory helper. Called as `Student.display()`, never on an instance.
+
+```mermaid
+classDiagram
+    class Credentials {
+        +user
+        -#apiKey
+        +constructor(user, key)
+        +getAuthHeader()
+    }
+    class Student {
+        +name_student
+        +age
+        +static mentor_name
+        +static display()
+    }
+    note for Credentials "#apiKey hidden\nreach via method"
+    note for Student "static = class-level\nStudent.display()"
+```
+
+```js
+// 173_Car.js — class blueprint + parameterised constructor + this
+class Car {
+  constructor(name) {
+    this.name = name;        // runs once on `new`
+  }
+  drive() {                  // method = function inside a class
+    console.log("i am driving", this.name);
+  }
+}
+const tesla = new Car("Model S");
+tesla.drive();               // i am driving Model S
+
+// 176_Private_Public.js — #private vs public
+class Credentials {
+  #apiKey;                   // private — hidden outside
+  constructor(user, key) {
+    this.user = user;        // public
+    this.#apiKey = key;
+  }
+  getAuthHeader() { return "Bearer " + this.#apiKey; }
+}
+const cred = new Credentials("admin", "secret_1234");
+console.log(cred.getAuthHeader());  // Bearer secret_1234
+
+// 177_Statis.js — static = class-level, not per-object
+class Student {
+  static mentor_name = "Pramod Dutta";
+  static display() { console.log("class-level method"); }
+}
+console.log(Student.mentor_name);   // call on the class, not an instance
+```
+
+### Run them
+
+```bash
+node 02_CLASS_OBJECT/173_Car.js          # blueprint + constructor
+node 02_CLASS_OBJECT/176_Private_Public.js  # #private fields
+node 02_CLASS_OBJECT/177_Statis.js       # static members
+```
 
 ---
 
@@ -4237,7 +4327,7 @@ graph TD
     subgraph next["Next Up — Playwright Basics"]
         N1[Ch 17: Promises ✅] --> N2[Ch 18: Async / Await ✅]
         N2 --> N3[Ch 19: Playwright Basics ✅]
-        N3 --> N4[Ch 20: TS Export / Import ✅]
+        N3 --> N4[Ch 20: OOP — Modules + Classes ✅]
         N4 --> N5[Ch 21: Locators & POM]
     end
 
@@ -4264,7 +4354,7 @@ graph TD
 - ✅ Chapter 17 — **Promises**: `new Promise` (resolve/reject), `.then`/`.catch`/`.finally`, chaining to flatten callback hell, `Promise.all` vs `allSettled`, IQ traps (`throw` in `.then`, settle order) (files `154`–`160`)
 - ✅ Chapter 18 — **Async / Await**: `async`/`await` as sugar over promises, `try/catch/finally` error handling, flat E2E awaits vs `.then()` chains, sequential vs parallel (`Promise.allSettled`), first real Playwright tests (files `161`–`167`)
 - ✅ Chapter 19 — **Playwright Basics**: first real PW project — `playwright.config.ts`, the built-in `page` fixture, `page.goto` + `toHaveTitle`, a `codegen`-recorded login flow (`fill`/`click`/`toBeVisible`/`toContainText`/`toMatchAriaSnapshot`)
-- ✅ Chapter 20 — **TypeScript Basics (Export / Import)**: ES modules — named vs default exports, `import { x as alias }` for name clashes, default import with no braces, mixing default + named in one file (`utils.js`/`testutils.js`/`logger.js` + `ExplainDefault.md`)
+- ✅ Chapter 20 — **OOP Basics (Modules + Classes & Objects)**: Part 1 ES modules — named vs default exports, `import { x as alias }`, mixing default + named (`01_EXPORT_IMPORT/` + `ExplainDefault.md`); Part 2 classes & objects — blueprint/`new`/constructor/`this`, method vs function, `#private` fields, `static` class-level members (`02_CLASS_OBJECT/171`–`178`)
 - ✅ **Per-chapter README** — every chapter folder now has its own deep-dive README.md
 
 ---
