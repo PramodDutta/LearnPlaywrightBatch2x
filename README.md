@@ -379,11 +379,34 @@ LearnPlaywrightBatch2x/
 │   ├── 199_IQ.ts                       # typed helpers — string/number/boolean/void
 │   └── 200_IQ.ts                       # typed array filter — number[] in/out
 │
-├── chapter_27_TypeScript_Interface/    ✅ TypeScript — interfaces, optional, readonly
+├── chapter_27_TypeScript_Interface/    ✅ TypeScript — interfaces, optional, readonly, extends
 │   ├── 201_IF.ts                       # interface shape — object must match
 │   ├── 202_IF_Part2.ts                 # optional `?` properties
 │   ├── 203_IF_READONLY.ts              # readonly + optional combined
-│   └── 204_IF_READOnly.ts              # readonly fields + readonly arrays
+│   ├── 204_IF_READOnly.ts              # readonly fields + readonly arrays
+│   ├── 205_Interface.ts                # method signatures in an interface
+│   ├── 206_Hooks.ts                    # function-type interface (callable)
+│   ├── 207_Bug REPORT.ts               # array-of-objects modelled by interface
+│   ├── 208_TestConfig.ts               # optional config props (CI vs local)
+│   ├── 209_REAL_EXAMPLE.ts             # interface `extends` — BasePage → LoginPage
+│   └── 210_Class_Interface.ts          # class `implements` an interface
+│
+├── chapter_28_ENUM/                    ✅ TypeScript — enums (named constants)
+│   ├── 211_ENUM.ts                     # string enum — TestStatus
+│   ├── 212_Enum_Fn.ts                  # severity + environment URL enums
+│   ├── 213_ENUM.ts                     # enum in a switch — Browser
+│   └── 214_API_.ts                     # HTTPMethod enum as fn param
+│
+├── chapter_29_Typescript_Generic/      ✅ TypeScript — generics `<T>`
+│   ├── 215_Generic.ts                  # generic function — getFirstResult<T>
+│   ├── 216_Generic_Class.ts            # generic class — TestDataStorage<T>
+│   └── 217_Generic_API_RESPONSE.ts     # generic wrapper — wrapResponse<T>
+│
+├── chapter_30_PRIVATE_PUBLIC_PROTECTED/ ✅ TypeScript — access modifiers + abstract
+│   ├── 218_PPP.ts                      # public / private / protected
+│   ├── 219_PageObjectModel.ts          # protected reused by subclass (POM)
+│   ├── 220_READONLY.ts                 # readonly class fields
+│   └── 221_Abstract_Class.ts           # abstract class — forced contract + shared code
 │
 ├── tsconfig.json                       ⚙️  TS compiler config (strict, nodenext, esnext)
 │
@@ -4612,12 +4635,164 @@ let response: APIReponse = { statusCode: 200, body: '{"user": "admin"}' };
 response.body = "updated";        // ✅ allowed
 ```
 
+**More interface patterns** (`205`–`210`): method signatures inside an interface (`205`), a **callable** function-type interface for hooks (`206`), modelling arrays of objects (`207`), optional config props for CI-vs-local (`208`), interface **`extends`** to share a base shape (`209_REAL_EXAMPLE.ts` — `BasePage` → `LoginPage`), and a class **`implements`** an interface (`210`).
+
+```ts
+// 209_REAL_EXAMPLE.ts — interface extends (share a base shape)
+interface BasePage { url: string; title: string; }
+interface LoginPage extends BasePage {
+  usernameSelector: string;
+  passwordSelector: string;
+  loginButtonSelector: string;
+}
+
+// 210_Class_Interface.ts — a class implements the contract
+interface Executable { name: string; run(): void; getStatus(): string; }
+class TestCase implements Executable {
+  constructor(public name: string) {}
+  run(): void { console.log("[RUN] " + this.name); }
+  getStatus(): string { return "PASS"; }
+}
+```
+
 ### Run them
 
 ```bash
 cd chapter_27_TypeScript_Interface
 node 201_IF.ts               # Node ≥ 22.18 runs .ts directly
-node 203_IF_READONLY.ts      # or: npx tsx 203_IF_READONLY.ts
+node 209_REAL_EXAMPLE.ts     # or: npx tsx 209_REAL_EXAMPLE.ts
+node 210_Class_Interface.ts
+```
+
+---
+
+## 📖 What's in Chapter 28 — Enums (Available Now)
+
+An **enum** names a fixed set of related constants — the allowed statuses, browsers, HTTP methods — so you use `TestStatus.Pass` instead of a loose `"PASS"` string.
+
+| File | Topic | What you'll learn |
+|------|-------|-------------------|
+| `211_ENUM.ts` | String enum | `enum TestStatus { Pass = "PASS", ... }` |
+| `212_Enum_Fn.ts` | Multiple enums | Severity levels + environment base-URLs |
+| `213_ENUM.ts` | Enum in `switch` | `launchBrowser(browser: Browser)` — exhaustive cases |
+| `214_API_.ts` | Enum as param | `sendRequest(method: HTTPMethod, ...)` |
+
+**Concept:** An enum is a named group of constants. String enums give each member a readable value (`Environment.Prod === "https://api.com"`), and the enum name becomes a **type** you can accept as a parameter.
+
+**Why:** Stops typos and magic strings. `browser: Browser` only accepts the four defined values — a stray `"chorme"` fails to compile, and autocomplete lists the valid options.
+
+**Q&A — why use this?**
+- **Q: Enum vs a plain string?** A: A string param accepts *any* string. An enum param accepts only the declared members — the compiler + editor enforce the set.
+- **Q: Why give members values (`= "PASS"`)?** A: String enums serialise to meaningful values (logs, API payloads) instead of the default `0,1,2` numeric ones.
+- **Q: Where in testing?** A: Statuses, severities, browsers, environments, HTTP verbs — any closed list a test picks from.
+
+```ts
+// 213_ENUM.ts — enum as a type + switch
+enum Browser { Chrome = "chrome", Firefox = "firefox", Safari = "safari", Edge = "edge" }
+function launchBrowser(browser: Browser): void {
+  switch (browser) {
+    case Browser.Chrome:  console.log("Launching Chromium"); break;
+    case Browser.Firefox: console.log("Launching Gecko"); break;
+    // ...
+  }
+}
+launchBrowser(Browser.Chrome);   // only Browser.* accepted
+```
+
+### Run them
+
+```bash
+cd chapter_28_ENUM
+node 213_ENUM.ts             # or: npx tsx 213_ENUM.ts
+node 214_API_.ts
+```
+
+---
+
+## 📖 What's in Chapter 29 — Generics (Available Now)
+
+**Generics** (`<T>`) let one function or class work with *any* type while staying type-safe — pass `<number>` and it's a number tool, pass `<string>` and it's a string tool, with no `any` and no duplication.
+
+| File | Topic | What you'll learn |
+|------|-------|-------------------|
+| `215_Generic.ts` | Generic function | `getFirstResult<T>(results: T[]): T` — plus the `!` non-null assertion |
+| `216_Generic_Class.ts` | Generic class | `TestDataStorage<T>` — typed add/getFirst/getAll |
+| `217_Generic_API_RESPONSE.ts` | Generic wrapper | `wrapResponse<T>(code, data)` — `{ statusCode, data: T }` |
+
+**Concept:** A type parameter `<T>` is a placeholder filled in at the call site. `getFirstResult<number>([...])` binds `T = number`, so the return is `number` — checked, not `any`.
+
+**Why:** Write a helper once, reuse it for every type. A `TestDataStorage<string>` and `TestDataStorage<number>` share code but keep their element types distinct.
+
+**Q&A — why use this?**
+- **Q: Generic vs `any`?** A: `any` throws away type info. `<T>` **remembers** it — `getFirstResult<string>(...)` returns `string`, so `.toUpperCase()` is valid and `.toFixed()` is an error.
+- **Q: What's the `!` in `results[0]!`?** A: The non-null assertion — with `noUncheckedIndexedAccess`, `results[0]` is `T | undefined`; `!` strips the `undefined`. Compile-time only, unsafe if the array is empty.
+- **Q: Do I always pass `<T>` explicitly?** A: No — TS often infers it from the arguments. Explicit `<number>` is for clarity or when inference can't tell.
+
+```ts
+// 216_Generic_Class.ts — one class, many element types
+class TestDataStorage<T> {
+  private items: T[] = [];
+  add(item: T): void { this.items.push(item); }
+  getFirst(): T { return this.items[0]!; }
+  getAll(): T[] { return this.items; }
+}
+const codes = new TestDataStorage<number>();   // number store
+const names = new TestDataStorage<string>();   // string store
+codes.add(200); names.add("Login Test");
+```
+
+### Run them
+
+```bash
+cd chapter_29_Typescript_Generic
+node 215_Generic.ts          # or: npx tsx 215_Generic.ts
+node 216_Generic_Class.ts
+```
+
+---
+
+## 📖 What's in Chapter 30 — Access Modifiers & Abstract Classes (Available Now)
+
+TypeScript's `public` / `private` / `protected` / `readonly` control **who can touch a class member**, and `abstract` classes force subclasses to implement a contract while sharing base code.
+
+| File | Topic | What you'll learn |
+|------|-------|-------------------|
+| `218_PPP.ts` | public / private / protected | `apiKey` private, `timeout` protected (subclass sees it), `baseURL` public |
+| `219_PageObjectModel.ts` | protected in POM | `BasePage.navigate()` is `protected` — used by `LoginPage`, hidden outside |
+| `220_READONLY.ts` | readonly fields | Config set in the constructor, then frozen |
+| `221_Abstract_Class.ts` | abstract class | `abstract setup()` must be implemented; `loan1()` inherited as shared code |
+
+**Concept:** Modifiers scope access — `private` (this class only), `protected` (class + subclasses), `public` (anywhere, the default), `readonly` (no reassignment after init). An `abstract` class can't be instantiated; it defines `abstract` methods children must supply plus concrete methods they inherit.
+
+**Why:** Encapsulation with compiler teeth. A Page Object hides internals (`private`), shares helpers with subclasses (`protected`), and an abstract `BaseTest` guarantees every test has `setup`/`execute`/`teardown`.
+
+**Q&A — why use this?**
+- **Q: private vs protected?** A: `private` is invisible even to subclasses; `protected` is visible to subclasses but not outside. `219_PageObjectModel.ts` uses `protected navigate()` so `LoginPage` can call it.
+- **Q: abstract class vs interface?** A: An interface is a pure shape (erased at runtime). An abstract class carries **real code + state + constructors** and can force overrides — pick it when children share implementation.
+- **Q: TS `private` vs JS `#private`?** A: `#` is a runtime-enforced hard private (Ch 21/22). TS `private` is compile-time only — it disappears in the emitted JS.
+
+```ts
+// 221_Abstract_Class.ts — forced contract + shared code
+abstract class BaseTest {
+  protected testName: string;
+  constructor(testName: string) { this.testName = testName; }
+  abstract setup(): void;      // child MUST implement
+  abstract execute(): void;
+  loan1(): void { console.log("Hi"); }   // inherited as-is
+}
+class UITest extends BaseTest {
+  setup(): void { console.log("Setup: launch browser"); }
+  execute(): void { console.log("Execute: click, fill"); }
+  // loan1() inherited free
+}
+```
+
+### Run them
+
+```bash
+cd chapter_30_PRIVATE_PUBLIC_PROTECTED
+node 218_PPP.ts              # or: npx tsx 218_PPP.ts
+node 221_Abstract_Class.ts
 ```
 
 ---
@@ -4634,7 +4809,10 @@ graph TD
         N5 --> N6[Ch 25: OOP Interview Qs ✅]
         N6 --> N7[Ch 26: TypeScript ✅]
         N7 --> N8[Ch 27: TS Interfaces ✅]
-        N8 --> N9[Ch 28: Locators & POM]
+        N8 --> N9[Ch 28: Enums ✅]
+        N9 --> N10[Ch 29: Generics ✅]
+        N10 --> N11[Ch 30: Access Modifiers + Abstract ✅]
+        N11 --> N12[Ch 31: Locators & POM]
     end
 
     style next fill:#fff3e0,stroke:#e65100
@@ -4667,7 +4845,10 @@ graph TD
 - ✅ Chapter 24 — **Polymorphism**: method overriding — same name, different body per class (file `192`)
 - ✅ Chapter 25 — **OOP Interview Questions**: fields + `display()`, constructor default values, `this` per object, method chaining `return this` (`EX1`–`EX4`)
 - ✅ Chapter 26 — **TypeScript**: type annotations, primitives, `number[]`/`Array<string>`, `any` vs `unknown` + narrowing, `void` vs `never`, typed helpers (files `193`–`200`) + root `tsconfig.json`
-- ✅ Chapter 27 — **TypeScript Interfaces**: object-shape contracts, optional `?` properties, `readonly` fields & `readonly` arrays (files `201`–`204`)
+- ✅ Chapter 27 — **TypeScript Interfaces**: object-shape contracts, optional `?` & `readonly`, method signatures, callable function-type interfaces, interface `extends`, class `implements` (files `201`–`210`)
+- ✅ Chapter 28 — **Enums**: string enums as named constant sets, enum-as-type params, enum in `switch` — statuses, browsers, environments, HTTP methods (files `211`–`214`)
+- ✅ Chapter 29 — **Generics**: `<T>` generic functions, generic classes (`TestDataStorage<T>`), generic wrappers, `!` non-null assertion (files `215`–`217`)
+- ✅ Chapter 30 — **Access Modifiers & Abstract Classes**: `public`/`private`/`protected`/`readonly`, protected reuse in POM, `abstract` forced-contract classes (files `218`–`221`)
 - ✅ **Per-chapter README** — every chapter folder now has its own deep-dive README.md
 
 ---
